@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- Package Information -->
+    <PackageId>Hermes.Core</PackageId>
+    <Title>Hermes Core</Title>
+    <Description>Core abstractions for event-driven architecture and messaging in .NET applications</Description>
+    <Authors>Draeggiar</Authors>
+    <Company>Draeggiar</Company>
+    <Product>Hermes</Product>
+    <Copyright>Copyright © 2024</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/Draeggiar/Hermes</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Draeggiar/Hermes</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>messaging;events;commands;cqrs;event-driven;architecture;abstractions</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+    <!-- Versioning -->
+    <VersionPrefix>1.0.0</VersionPrefix>
+    
+    <!-- Source Link -->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>
