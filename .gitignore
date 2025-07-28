@@ -54,3 +54,7 @@ coverage/
 TestResults/
 [Tt]est[Rr]esult*/
 *.trx
+
+# CI artifacts
+artifacts/
+test-artifacts/

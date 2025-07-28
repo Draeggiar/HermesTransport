@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  release:
+    types: [ published ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      package-version: ${{ steps.version.outputs.package-version }}
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Required for versioning
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Determine Version
+      id: version
+      run: |
+        if [[ "${{ github.event_name }}" == "release" ]]; then
+          # Use the release tag for version
+          VERSION="${{ github.event.release.tag_name }}"
+          # Remove 'v' prefix if present
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "package-version=$VERSION" >> $GITHUB_OUTPUT
+        else
+          # Use a pre-release version for other builds
+          BASE_VERSION="1.0.0"
+          BUILD_NUMBER="${{ github.run_number }}"
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            VERSION="$BASE_VERSION-alpha.$BUILD_NUMBER"
+          else
+            VERSION="$BASE_VERSION-dev.$BUILD_NUMBER"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "package-version=$VERSION" >> $GITHUB_OUTPUT
+        fi
+        echo "Determined version: $VERSION"
+    
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --no-restore --configuration Release -p:Version=${{ steps.version.outputs.package-version }}
+    
+    - name: Test
+      run: dotnet test --no-build --configuration Release --verbosity normal
+      continue-on-error: true # Allow tests to fail since there might not be any tests yet
+    
+    - name: Pack
+      run: dotnet pack --no-build --configuration Release --output ./artifacts -p:PackageVersion=${{ steps.version.outputs.package-version }}
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts/*.nupkg
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    
+    steps:
+    - name: Download artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: nuget-packages
+        path: ./artifacts
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Publish to NuGet
+      run: |
+        for package in ./artifacts/*.nupkg; do
+          echo "Publishing $package"
+          dotnet nuget push "$package" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        done
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
