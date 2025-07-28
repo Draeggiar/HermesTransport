@@ -5,11 +5,12 @@ A .NET library that provides core abstractions for event-driven architecture and
 ## Features
 
 - **Core Abstractions**: Clean interfaces for messages, events, commands, and handlers
-- **Message Envelopes**: Generic context support for storing correlation IDs, user information, and custom data
+- **Message Envelopes**: Generic context support for storing any custom context information
 - **Publisher/Subscriber Pattern**: Send and receive messages asynchronously
 - **Event-Driven Architecture**: Support for events and commands with proper separation
 - **Pluggable Brokers**: Abstraction layer for different messaging systems (RabbitMQ, SQL Server, etc.)
 - **Type Safety**: Strongly-typed message handling with generics
+- **Separated Responsibilities**: Focused interfaces that are easy to implement
 
 ## Core Concepts
 
@@ -20,22 +21,23 @@ A .NET library that provides core abstractions for event-driven architecture and
 
 ### Message Envelopes
 - `IMessageEnvelope<TMessage, TContext>`: Wraps messages with additional context information
-- `MessageContext`: Built-in context type for common scenarios (correlation ID, user info, request data)
+- Generic context support for any custom context type
 - Extension methods for easy envelope creation with fluent API
 
 ### Handlers
 - `IMessageHandler<T>`: Processes messages of type T
 - `IEventHandler<T>`: Processes events of type T  
 - `ICommandHandler<T>`: Processes commands of type T
-- `IMessageEnvelopeHandler<T, TContext>`: Processes message envelopes with context
 
 ### Publishers/Senders
 - `IEventPublisher`: Publishes events to subscribers
 - `ICommandSender`: Sends commands for processing
-- `IMessagePublisher`: Generic message publishing with context support
+- `IMessagePublisher`: Generic message publishing
+- `IMessageSubscriber`: Subscribe to messages with handlers
 
 ### Brokers
-- `IMessageBroker`: Abstraction for message transport and storage
+- `IMessageBroker`: Abstraction for message transport and storage management
+- Provides publisher and subscriber instances
 - Implementations available via separate plugin libraries
 
 ## Quick Start
@@ -77,7 +79,6 @@ public class CreateUserCommand : CommandBase
 ### 2. Create Handlers
 
 ```csharp
-// Simple message handler
 public class UserCreatedEventHandler : IEventHandler<UserCreatedEvent>
 {
     public Task HandleAsync(UserCreatedEvent message, CancellationToken cancellationToken = default)
@@ -87,15 +88,12 @@ public class UserCreatedEventHandler : IEventHandler<UserCreatedEvent>
     }
 }
 
-// Envelope handler with context
-public class UserCreatedEnvelopeHandler : IEventEnvelopeHandler<UserCreatedEvent, MessageContext>
+public class CreateUserCommandHandler : ICommandHandler<CreateUserCommand>
 {
-    public Task HandleAsync(IMessageEnvelope<UserCreatedEvent, MessageContext> envelope, CancellationToken cancellationToken = default)
+    public Task HandleAsync(CreateUserCommand command, CancellationToken cancellationToken = default)
     {
-        var message = envelope.Message;
-        var context = envelope.Context;
-        
-        Console.WriteLine($"User {message.Name} created by user {context.UserId} in request {context.RequestId}");
+        Console.WriteLine($"Creating user: {command.Name} ({command.Email})");
+        // Process the command...
         return Task.CompletedTask;
     }
 }
@@ -104,20 +102,24 @@ public class UserCreatedEnvelopeHandler : IEventEnvelopeHandler<UserCreatedEvent
 ### 3. Working with Message Context
 
 ```csharp
-// Create messages with context using extension methods
-var command = new CreateUserCommand("john@example.com", "John Doe")
-    .WithCorrelationId("req-123")
-    .WithUser("admin-user", "Admin")
-    .WithRequestContext("req-123", "corr-456", "admin-user");
-
 // Create custom context
-var customContext = new { RequestSource = "API", Version = "2.1" };
-var envelope = new UserCreatedEvent("user-123", "john@example.com", "John")
-    .WithContext(customContext);
+public class UserOperationContext
+{
+    public string AdminUserId { get; set; }
+    public string RequestSource { get; set; }
+    public DateTime OperationTime { get; set; }
+}
 
-// Publish with context
-await broker.PublishAsync(command);
-await broker.PublishAsync(envelope);
+// Create messages with context
+var context = new UserOperationContext 
+{ 
+    AdminUserId = "admin-123", 
+    RequestSource = "WebAPI",
+    OperationTime = DateTime.UtcNow
+};
+
+var envelope = new UserCreatedEvent("user-123", "john@example.com", "John")
+    .WithContext(context);
 ```
 
 ### 4. Set Up Messaging with External Broker
@@ -128,21 +130,22 @@ await broker.PublishAsync(envelope);
 using var broker = new RabbitMQMessageBroker(connectionString);
 await broker.ConnectAsync();
 
+// Get publisher and subscriber instances from broker
+var eventPublisher = broker.GetEventPublisher();
+var commandSender = broker.GetCommandSender();
+var subscriber = broker.GetSubscriber();
+
 // Subscribe to messages
 var handler = new UserCreatedEventHandler();
-var subscription = broker.Subscribe<UserCreatedEvent>(handler);
+var subscription = subscriber.Subscribe<UserCreatedEvent>(handler);
 await subscription.StartAsync();
 
-// Subscribe to envelopes with context
-var envelopeHandler = new UserCreatedEnvelopeHandler();
-var envelopeSubscription = broker.Subscribe<UserCreatedEvent, MessageContext>(envelopeHandler);
-await envelopeSubscription.StartAsync();
-
 // Publish messages
-var userEvent = new UserCreatedEvent("user-123", "john@example.com", "John")
-    .WithRequestContext("req-123", "corr-456", "admin-user");
-    
-await broker.PublishAsync(userEvent);
+var userEvent = new UserCreatedEvent("user-123", "john@example.com", "John");
+await eventPublisher.PublishEventAsync(userEvent);
+
+var createCommand = new CreateUserCommand("jane@example.com", "Jane");
+await commandSender.SendCommandAsync(createCommand);
 ```
 
 ## Architecture
@@ -153,10 +156,13 @@ The library provides a clean separation between messaging abstractions and trans
 ┌─────────────────────────────────────────────────────┐
 │                 Application Layer                   │
 ├─────────────────────────────────────────────────────┤
-│  IEventPublisher │ ICommandSender │ IMessagePublisher │
-├─────────────────────────────────────────────────────┤
-│               IMessageBroker                        │
-│           (Pluggable Abstraction)                   │
+│                IMessageBroker                       │
+│           (Connection Management)                   │
+│  ┌─────────────────────┬─────────────────────────┐  │
+│  │   IEventPublisher   │   IMessageSubscriber    │  │
+│  │   ICommandSender    │                         │  │
+│  │   IMessagePublisher │                         │  │
+│  └─────────────────────┴─────────────────────────┘  │
 ├─────────────────────────────────────────────────────┤
 │  RabbitMQBroker │ SqlServerBroker │ AzureServiceBus │
 │  (plugin)       │ (plugin)        │ (plugin)        │
@@ -165,21 +171,9 @@ The library provides a clean separation between messaging abstractions and trans
 
 ## Message Context and Envelopes
 
-Hermes supports rich context information that travels with messages:
+Hermes supports rich context information that travels with messages using any custom context type:
 
 ```csharp
-// Built-in MessageContext
-var context = new MessageContext
-{
-    CorrelationId = "corr-123",
-    UserId = "user-456", 
-    UserName = "John Doe",
-    SessionId = "sess-789",
-    RequestId = "req-abc",
-    ClientIpAddress = "192.168.1.1",
-    Properties = { ["source"] = "api", ["version"] = "2.1" }
-};
-
 // Custom context types
 public class OrderContext
 {
@@ -188,8 +182,18 @@ public class OrderContext
     public DateTime OrderDate { get; set; }
 }
 
+public class RequestContext
+{
+    public string CorrelationId { get; set; }
+    public string UserId { get; set; }
+    public string ClientIP { get; set; }
+}
+
 var orderCommand = new ProcessOrderCommand(orderId)
     .WithContext(new OrderContext { CustomerId = "cust-123", OrderId = orderId });
+
+var userEvent = new UserCreatedEvent("user-123", "john@example.com", "John")
+    .WithContext(new RequestContext { CorrelationId = "req-123", UserId = "admin" });
 ```
 
 ## Extending with External Systems

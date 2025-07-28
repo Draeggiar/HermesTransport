@@ -82,27 +82,4 @@ public interface IMessageSubscriber
     /// <returns>A subscription that can be used to control the message flow.</returns>
     ISubscription Subscribe<TMessage>(string topic, IMessageHandler<TMessage> handler, SubscriptionOptions? options = null) 
         where TMessage : IMessage;
-
-    /// <summary>
-    /// Subscribes to message envelopes of a specific type.
-    /// </summary>
-    /// <typeparam name="TMessage">The type of message to subscribe to.</typeparam>
-    /// <typeparam name="TContext">The type of context information.</typeparam>
-    /// <param name="handler">The handler that will process the message envelopes.</param>
-    /// <param name="options">Optional subscription options.</param>
-    /// <returns>A subscription that can be used to control the message flow.</returns>
-    ISubscription Subscribe<TMessage, TContext>(IMessageEnvelopeHandler<TMessage, TContext> handler, SubscriptionOptions? options = null) 
-        where TMessage : IMessage;
-    
-    /// <summary>
-    /// Subscribes to message envelopes on a specific topic.
-    /// </summary>
-    /// <typeparam name="TMessage">The type of message to subscribe to.</typeparam>
-    /// <typeparam name="TContext">The type of context information.</typeparam>
-    /// <param name="topic">The topic to subscribe to.</param>
-    /// <param name="handler">The handler that will process the message envelopes.</param>
-    /// <param name="options">Optional subscription options.</param>
-    /// <returns>A subscription that can be used to control the message flow.</returns>
-    ISubscription Subscribe<TMessage, TContext>(string topic, IMessageEnvelopeHandler<TMessage, TContext> handler, SubscriptionOptions? options = null) 
-        where TMessage : IMessage;
 }
