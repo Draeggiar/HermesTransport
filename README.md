@@ -1,6 +1,8 @@
-# Hermes
+# Hermes [![Build status](https://github.com/Draeggiar/Hermes/actions/workflows/ci.yml/badge.svg)](https://github.com/Draeggiar/Hermes/actions)
 
 A .NET library that provides core abstractions for event-driven architecture and messaging. It offers clean interfaces and patterns for building messaging systems with pluggable broker implementations.
+
+[![Serilog](https://github.com/Draeggiar/Hermes/blob/master/assets/icon.png)](https://github.com/Draeggiar/Hermes)
 
 ## Features
 

@@ -6,13 +6,13 @@
     <Nullable>enable</Nullable>
     
     <!-- Package Information -->
-    <PackageId>Hermes.Core</PackageId>
-    <Title>Hermes Core</Title>
+    <PackageId>Hermes.Abstractions</PackageId>
+    <Title>Hermes</Title>
     <Description>Core abstractions for event-driven architecture and messaging in .NET applications</Description>
     <Authors>Draeggiar</Authors>
     <Company>Draeggiar</Company>
     <Product>Hermes</Product>
-    <Copyright>Copyright © 2024</Copyright>
+    <Copyright>Copyright © 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/Draeggiar/Hermes</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Draeggiar/Hermes</RepositoryUrl>
@@ -28,10 +28,12 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageIcon>icon.png</PackageIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets/icon.png" Pack="true" Visible="false" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
