@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{92CDFFE8-B373-4CDE-90BE-53B5A75D2AE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hermes.Core", "src\Hermes.Core\Hermes.Core.csproj", "{B89CA8A2-4036-4122-90A7-EAB8BEA40BC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HermesTransport", "src\HermesTransport\HermesTransport.csproj", "{B89CA8A2-4036-4122-90A7-EAB8BEA40BC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

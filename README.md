@@ -1,8 +1,8 @@
-# Hermes [![Build status](https://github.com/Draeggiar/Hermes/actions/workflows/ci.yml/badge.svg)](https://github.com/Draeggiar/Hermes/actions)
+# HermesTransport [![Build status](https://github.com/Draeggiar/HermesTransport/actions/workflows/ci.yml/badge.svg)](https://github.com/Draeggiar/HermesTransport/actions)
 
 A .NET library that provides core abstractions for event-driven architecture and messaging. It offers clean interfaces and patterns for building messaging systems with pluggable broker implementations.
 
-[![Serilog](https://github.com/Draeggiar/Hermes/blob/master/assets/icon.png)](https://github.com/Draeggiar/Hermes)
+[![Serilog](https://github.com/Draeggiar/HermesTransport/blob/master/assets/icon.png)](https://github.com/Draeggiar/HermesTransport)
 
 ## Features
 
@@ -47,7 +47,7 @@ A .NET library that provides core abstractions for event-driven architecture and
 ### 1. Create Messages
 
 ```csharp
-using Hermes.Core;
+using HermesTransport;
 
 public class UserCreatedEvent : EventBase
 {
@@ -173,7 +173,7 @@ The library provides a clean separation between messaging abstractions and trans
 
 ## Message Context and Envelopes
 
-Hermes supports rich context information that travels with messages using any custom context type:
+HermesTransport supports rich context information that travels with messages using any custom context type:
 
 ```csharp
 // Custom context types
@@ -202,16 +202,16 @@ var userEvent = new UserCreatedEvent("user-123", "john@example.com", "John")
 
 This core library is designed to be extended with plugin libraries that implement `IMessageBroker`:
 
-- **Hermes.RabbitMQ**: RabbitMQ implementation
-- **Hermes.SqlServer**: SQL Server Service Broker implementation  
-- **Hermes.AzureServiceBus**: Azure Service Bus implementation
-- **Hermes.Redis**: Redis Streams implementation
+- **HermesTransport.RabbitMQ**: RabbitMQ implementation
+- **HermesTransport.SqlServer**: SQL Server Service Broker implementation  
+- **HermesTransport.AzureServiceBus**: Azure Service Bus implementation
+- **HermesTransport.Redis**: Redis Streams implementation
 
 ## Project Structure
 
 ```
 src/
-└── Hermes.Core/
+└── HermesTransport/
     ├── IMessage.cs              # Core message interface
     ├── IEvent.cs                # Event interface
     ├── ICommand.cs              # Command interface

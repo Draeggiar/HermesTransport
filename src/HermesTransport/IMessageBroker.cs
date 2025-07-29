@@ -1,4 +1,4 @@
-namespace Hermes.Core;
+namespace HermesTransport;
 
 /// <summary>
 /// Defines the contract for message brokers that handle the transport and storage of messages.

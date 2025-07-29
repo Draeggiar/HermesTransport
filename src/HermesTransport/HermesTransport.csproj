@@ -6,16 +6,16 @@
     <Nullable>enable</Nullable>
     
     <!-- Package Information -->
-    <PackageId>Hermes.Abstractions</PackageId>
-    <Title>Hermes</Title>
+    <PackageId>HermesTransport</PackageId>
+    <Title>HermesTransport</Title>
     <Description>Core abstractions for event-driven architecture and messaging in .NET applications</Description>
     <Authors>Draeggiar</Authors>
     <Company>Draeggiar</Company>
-    <Product>Hermes</Product>
+    <Product>HermesTransport</Product>
     <Copyright>Copyright © 2025</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Draeggiar/Hermes</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Draeggiar/Hermes</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Draeggiar/HermesTransport</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Draeggiar/HermesTransport</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>messaging;events;commands;cqrs;event-driven;architecture;abstractions</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
