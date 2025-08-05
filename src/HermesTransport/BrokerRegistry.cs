@@ -3,7 +3,7 @@ namespace HermesTransport;
 /// <summary>
 /// Default implementation of IBrokerRegistry that manages multiple message brokers.
 /// </summary>
-public class BrokerRegistry : IBrokerRegistry
+internal class BrokerRegistry : IBrokerRegistry
 {
     private IMessageBroker? _eventBroker;
     private IMessageBroker? _commandBroker; 

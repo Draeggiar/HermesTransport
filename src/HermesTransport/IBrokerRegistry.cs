@@ -4,7 +4,7 @@ namespace HermesTransport;
 /// Defines operations for managing multiple message brokers with different subscription options.
 /// Allows registering different brokers for different message types (Events, Commands, Messages).  
 /// </summary>
-public interface IBrokerRegistry
+internal interface IBrokerRegistry
 {
     /// <summary>
     /// Registers a message broker for handling events.
