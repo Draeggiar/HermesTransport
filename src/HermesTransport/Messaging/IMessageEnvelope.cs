@@ -1,4 +1,4 @@
-namespace HermesTransport;
+namespace HermesTransport.Messaging;
 
 /// <summary>
 /// Represents a generic message envelope that can carry additional context information

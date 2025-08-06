@@ -1,4 +1,4 @@
-namespace HermesTransport;
+namespace HermesTransport.Messaging;
 
 /// <summary>
 /// Provides helper methods for creating message envelopes.

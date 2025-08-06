@@ -1,10 +1,12 @@
-namespace HermesTransport;
+using HermesTransport.Messaging;
+
+namespace HermesTransport.Brokers;
 
 /// <summary>
 /// Defines the contract for message brokers that handle the transport and storage of messages.
 /// External systems like RabbitMQ, SQL Server, or in-memory implementations will implement this interface.
 /// </summary>
-public interface IMessageBroker : IDisposable
+public interface IMessageBroker : IAsyncDisposable
 {
     /// <summary>
     /// Gets a value indicating whether the broker is connected and ready to process messages.

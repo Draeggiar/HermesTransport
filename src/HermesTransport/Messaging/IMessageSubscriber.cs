@@ -1,4 +1,4 @@
-namespace HermesTransport;
+namespace HermesTransport.Messaging;
 
 /// <summary>
 /// Represents options for message subscription.
