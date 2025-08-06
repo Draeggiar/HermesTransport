@@ -1,4 +1,7 @@
-namespace HermesTransport;
+using HermesTransport.Brokers;
+using HermesTransport.Configuration;
+
+namespace HermesTransport.Messaging;
 
 /// <summary>
 /// A message publisher that routes messages to the appropriate broker based on message type.
@@ -16,7 +19,7 @@ internal class RoutingMessagePublisher : IMessagePublisher
     public Task PublishAsync<TMessage>(TMessage message, CancellationToken cancellationToken = default) 
         where TMessage : IMessage
     {
-        var broker = GetBrokerForMessage<TMessage>();
+        var broker = _brokerRegistry.GetBrokerForMessage<TMessage>();
         if (broker == null)
         {
             throw new InvalidOperationException($"No broker registered for message type: {typeof(TMessage).Name}");
@@ -30,7 +33,7 @@ internal class RoutingMessagePublisher : IMessagePublisher
     public Task PublishAsync<TMessage>(string topic, TMessage message, CancellationToken cancellationToken = default) 
         where TMessage : IMessage
     {
-        var broker = GetBrokerForMessage<TMessage>();
+        var broker = _brokerRegistry.GetBrokerForMessage<TMessage>();
         if (broker == null)
         {
             throw new InvalidOperationException($"No broker registered for message type: {typeof(TMessage).Name}");
@@ -38,24 +41,6 @@ internal class RoutingMessagePublisher : IMessagePublisher
 
         var publisher = broker.GetPublisher();
         return publisher.PublishAsync(topic, message, cancellationToken);
-    }
-
-    private IMessageBroker? GetBrokerForMessage<TMessage>() where TMessage : IMessage
-    {
-        // Route events to event broker
-        if (typeof(IEvent).IsAssignableFrom(typeof(TMessage)))
-        {
-            return _brokerRegistry.GetEventBroker();
-        }
-        
-        // Route commands to command broker
-        if (typeof(ICommand).IsAssignableFrom(typeof(TMessage)))
-        {
-            return _brokerRegistry.GetCommandBroker();
-        }
-        
-        // Route general messages to message broker
-        return _brokerRegistry.GetMessageBroker();
     }
 }
 

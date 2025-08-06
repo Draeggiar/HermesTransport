@@ -1,4 +1,6 @@
-namespace HermesTransport;
+using HermesTransport.Messaging;
+
+namespace HermesTransport.Brokers;
 
 /// <summary>
 /// Defines operations for managing multiple message brokers with different subscription options.

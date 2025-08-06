@@ -1,4 +1,4 @@
-namespace HermesTransport;
+namespace HermesTransport.Messaging;
 
 /// <summary>
 /// Base implementation of a message with common properties.

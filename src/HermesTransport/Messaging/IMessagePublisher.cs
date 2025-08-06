@@ -1,4 +1,4 @@
-namespace HermesTransport;
+namespace HermesTransport.Messaging;
 
 /// <summary>
 /// Defines operations for publishing messages to the messaging system.

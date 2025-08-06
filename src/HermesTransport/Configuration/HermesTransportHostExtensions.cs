@@ -1,7 +1,9 @@
+using HermesTransport.Brokers;
+using HermesTransport.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace HermesTransport;
+namespace HermesTransport.Configuration;
 
 /// <summary>
 /// Extension methods for configuring HermesTransport with dependency injection.

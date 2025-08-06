@@ -1,4 +1,6 @@
-namespace HermesTransport;
+using HermesTransport.Messaging;
+
+namespace HermesTransport.Brokers;
 
 /// <summary>
 /// Default implementation of IBrokerRegistry that manages multiple message brokers.

@@ -1,4 +1,7 @@
-namespace HermesTransport;
+using HermesTransport.Brokers;
+using HermesTransport.Messaging;
+
+namespace HermesTransport.Configuration;
 
 /// <summary>
 /// Configuration options for HermesTransport when used with dependency injection.
@@ -38,17 +41,6 @@ public class HermesTransportOptions
     public HermesTransportOptions RegisterMessageBroker(IMessageBroker broker)
     {
         Registry.RegisterMessageBroker(broker);
-        return this;
-    }
-
-    /// <summary>
-    /// Registers the same broker for all message types (events, commands, and messages).
-    /// </summary>
-    /// <param name="broker">The broker to register for all message types.</param>
-    /// <returns>The options instance for method chaining.</returns>
-    public HermesTransportOptions RegisterBrokerForAll(IMessageBroker broker)
-    {
-        Registry.RegisterBrokerForAll(broker);
         return this;
     }
 }
