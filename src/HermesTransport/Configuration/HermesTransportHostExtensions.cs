@@ -1,17 +1,18 @@
 using HermesTransport.Brokers;
 using HermesTransport.Messaging;
+using HermesTransport.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace HermesTransport.Configuration;
 
 /// <summary>
-/// Extension methods for configuring HermesTransport with dependency injection.
+///     Extension methods for configuring HermesTransport with dependency injection.
 /// </summary>
 public static class HermesTransportHostExtensions
 {
     /// <summary>
-    /// Adds HermesTransport services to the host builder and configures message brokers.
+    ///     Adds HermesTransport services to the host builder and configures message brokers.
     /// </summary>
     /// <param name="hostBuilder">The host builder to configure.</param>
     /// <param name="configureOptions">Action to configure HermesTransport options.</param>
@@ -24,23 +25,23 @@ public static class HermesTransportHostExtensions
         return hostBuilder.ConfigureServices((context, services) =>
         {
             // Configure options
-            var options = new HermesTransportOptions();
+            var options = new HermesTransportOptions(services);
             configureOptions(options);
 
             // Register the configured broker registry as singleton
-            services.AddSingleton<IBrokerRegistry>(options.Registry);
+            services.AddSingleton(options.BrokerRegistryBuilder.Build);
 
             // Register the routing publishers and senders
-            services.AddTransient<IMessagePublisher>(provider => 
+            services.AddTransient<IMessagePublisher>(provider =>
                 provider.GetRequiredService<IBrokerRegistry>().GetPublisher());
-            
-            services.AddTransient<IEventPublisher>(provider => 
+
+            services.AddTransient<IEventPublisher>(provider =>
                 provider.GetRequiredService<IBrokerRegistry>().GetEventPublisher());
-            
-            services.AddTransient<ICommandSender>(provider => 
+
+            services.AddTransient<ICommandSender>(provider =>
                 provider.GetRequiredService<IBrokerRegistry>().GetCommandSender());
-            
-            services.AddTransient<IMessageSubscriber>(provider => 
+
+            services.AddTransient<IMessageSubscriber>(provider =>
                 provider.GetRequiredService<IBrokerRegistry>().GetSubscriber());
         });
     }

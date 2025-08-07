@@ -1,35 +1,22 @@
 using HermesTransport.Messaging;
+using HermesTransport.Subscriptions;
 
 namespace HermesTransport.Brokers;
 
 /// <summary>
-/// Default implementation of IBrokerRegistry that manages multiple message brokers.
+///     Default implementation of IBrokerRegistry that manages multiple message brokers.
 /// </summary>
 internal class BrokerRegistry : IBrokerRegistry
 {
-    private IMessageBroker? _eventBroker;
-    private IMessageBroker? _commandBroker; 
-    private IMessageBroker? _messageBroker;
+    private readonly IMessageBroker _commandBroker;
+    private readonly IMessageBroker _eventBroker;
+    private readonly IMessageBroker _messageBroker;
 
-    /// <inheritdoc />
-    public IBrokerRegistry RegisterEventBroker(IMessageBroker broker)
+    public BrokerRegistry(IMessageBroker eventBroker, IMessageBroker commandBroker, IMessageBroker messageBroker)
     {
-        _eventBroker = broker ?? throw new ArgumentNullException(nameof(broker));
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IBrokerRegistry RegisterCommandBroker(IMessageBroker broker)
-    {
-        _commandBroker = broker ?? throw new ArgumentNullException(nameof(broker));
-        return this;
-    }
-
-    /// <inheritdoc />
-    public IBrokerRegistry RegisterMessageBroker(IMessageBroker broker)
-    {
-        _messageBroker = broker ?? throw new ArgumentNullException(nameof(broker));
-        return this;
+        _eventBroker = eventBroker ?? throw new ArgumentNullException(nameof(eventBroker));
+        _commandBroker = commandBroker ?? throw new ArgumentNullException(nameof(commandBroker));
+        _messageBroker = messageBroker ?? throw new ArgumentNullException(nameof(messageBroker));
     }
 
     /// <inheritdoc />
@@ -42,26 +29,14 @@ internal class BrokerRegistry : IBrokerRegistry
     public IMessageBroker? GetMessageBroker() => _messageBroker;
 
     /// <inheritdoc />
-    public IMessagePublisher GetPublisher()
-    {
-        return new RoutingMessagePublisher(this);
-    }
+    public IMessagePublisher GetPublisher() => new RoutingMessagePublisher(this);
 
     /// <inheritdoc />
-    public IMessageSubscriber GetSubscriber()
-    {
-        return new RoutingMessageSubscriber(this);
-    }
+    public IMessageSubscriber GetSubscriber() => new RoutingMessageSubscriber(this);
 
     /// <inheritdoc />
-    public IEventPublisher GetEventPublisher()
-    {
-        return new RoutingEventPublisher(this);
-    }
+    public IEventPublisher GetEventPublisher() => new RoutingEventPublisher(this);
 
     /// <inheritdoc />
-    public ICommandSender GetCommandSender()
-    {
-        return new RoutingCommandSender(this);
-    }
+    public ICommandSender GetCommandSender() => new RoutingCommandSender(this);
 }

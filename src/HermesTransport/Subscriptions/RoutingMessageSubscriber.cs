@@ -1,7 +1,7 @@
 using HermesTransport.Brokers;
-using HermesTransport.Configuration;
+using HermesTransport.Messaging;
 
-namespace HermesTransport.Messaging;
+namespace HermesTransport.Subscriptions;
 
 /// <summary>
 /// A message subscriber that routes subscription requests to the appropriate broker based on message type.

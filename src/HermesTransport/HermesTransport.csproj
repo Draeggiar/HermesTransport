@@ -21,7 +21,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     
     <!-- Versioning -->
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.1.1</VersionPrefix>
     
     <!-- Source Link -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

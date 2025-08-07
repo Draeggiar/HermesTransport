@@ -1,4 +1,5 @@
 using HermesTransport.Messaging;
+using HermesTransport.Subscriptions;
 
 namespace HermesTransport.Brokers;
 
@@ -8,27 +9,6 @@ namespace HermesTransport.Brokers;
 /// </summary>
 internal interface IBrokerRegistry
 {
-    /// <summary>
-    /// Registers a message broker for handling events.
-    /// </summary>
-    /// <param name="broker">The broker to register for events.</param>
-    /// <returns>The registry instance for method chaining.</returns>
-    IBrokerRegistry RegisterEventBroker(IMessageBroker broker);
-    
-    /// <summary>
-    /// Registers a message broker for handling commands.
-    /// </summary>
-    /// <param name="broker">The broker to register for commands.</param>
-    /// <returns>The registry instance for method chaining.</returns>
-    IBrokerRegistry RegisterCommandBroker(IMessageBroker broker);
-    
-    /// <summary>
-    /// Registers a message broker for handling general messages.
-    /// </summary>
-    /// <param name="broker">The broker to register for messages.</param>
-    /// <returns>The registry instance for method chaining.</returns>
-    IBrokerRegistry RegisterMessageBroker(IMessageBroker broker);
-    
     /// <summary>
     /// Gets the registered broker for events.
     /// </summary>

@@ -1,4 +1,5 @@
 using HermesTransport.Messaging;
+using HermesTransport.Subscriptions;
 
 namespace HermesTransport.Brokers;
 
