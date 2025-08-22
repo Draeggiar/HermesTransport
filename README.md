@@ -2,7 +2,7 @@
 
 A .NET library that provides core abstractions for event-driven architecture and messaging. It offers clean interfaces and patterns for building messaging systems with pluggable broker implementations.
 
-[![Serilog](https://github.com/Draeggiar/HermesTransport/blob/master/assets/icon.png)](https://github.com/Draeggiar/HermesTransport)
+[![HermesTransport](https://raw.githubusercontent.com/Draeggiar/HermesTransport/master/assets/icon.png)](https://github.com/Draeggiar/HermesTransport)
 
 ## Features
 
