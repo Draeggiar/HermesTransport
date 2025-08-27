@@ -17,9 +17,10 @@ public static class HandlerDiscoveryExtensions
     /// <returns>The options instance for method chaining.</returns>
     public static HermesTransportOptions EnableAutoDiscovery(this HermesTransportOptions options)
     {
+        var callingAssembly = Assembly.GetCallingAssembly();
         return options.EnableHandlerDiscoveryWithAutoRegistration(discovery =>
         {
-            discovery.ScanCallingAssembly();
+            discovery.ScanAssembly(callingAssembly);
         });
     }
 
