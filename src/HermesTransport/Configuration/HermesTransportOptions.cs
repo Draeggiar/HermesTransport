@@ -1,4 +1,5 @@
 using HermesTransport.Brokers;
+using HermesTransport.Discovery;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HermesTransport.Configuration;
@@ -11,6 +12,11 @@ public class HermesTransportOptions
 {
     internal readonly BrokerRegistryBuilder BrokerRegistryBuilder = new();
     public IServiceCollection Services { get; }
+
+    /// <summary>
+    /// Gets the handler discovery options.
+    /// </summary>
+    public HandlerDiscoveryOptions HandlerDiscoveryOptions { get; } = new();
 
     public HermesTransportOptions(IServiceCollection services)
     {
@@ -48,5 +54,50 @@ public class HermesTransportOptions
     {
         BrokerRegistryBuilder.RegisterMessageBroker(brokerFactory);
         return this;
+    }
+
+    /// <summary>
+    /// Enables handler autodiscovery with the specified configuration.
+    /// </summary>
+    /// <param name="configure">Action to configure handler discovery options.</param>
+    /// <returns>The options instance for method chaining.</returns>
+    public HermesTransportOptions EnableHandlerDiscovery(Action<HandlerDiscoveryOptions>? configure = null)
+    {
+        HandlerDiscoveryOptions.IsEnabled = true;
+        configure?.Invoke(HandlerDiscoveryOptions);
+        return this;
+    }
+
+    /// <summary>
+    /// Enables handler autodiscovery and automatically registers discovered handlers in the DI container.
+    /// </summary>
+    /// <param name="configure">Action to configure handler discovery options.</param>
+    /// <returns>The options instance for method chaining.</returns>
+    public HermesTransportOptions EnableHandlerDiscoveryWithAutoRegistration(Action<HandlerDiscoveryOptions>? configure = null)
+    {
+        HandlerDiscoveryOptions.IsEnabled = true;
+        configure?.Invoke(HandlerDiscoveryOptions);
+
+        // Auto-register discovered handlers in DI
+        RegisterDiscoveredHandlersInDI();
+        
+        return this;
+    }
+
+    private void RegisterDiscoveredHandlersInDI()
+    {
+        var discoveryService = new HandlerDiscoveryService();
+        var assemblies = HandlerDiscoveryOptions.AssembliesToScan.ToArray();
+        
+        if (assemblies.Length > 0)
+        {
+            var registrations = discoveryService.DiscoverHandlers(assemblies, HandlerDiscoveryOptions.TypeFilter);
+            
+            foreach (var registration in registrations)
+            {
+                // Register handler as transient in DI container
+                Services.AddTransient(registration.HandlerType);
+            }
+        }
     }
 }
