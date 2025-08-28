@@ -1,5 +1,6 @@
 using HermesTransport.Brokers;
 using HermesTransport.Discovery;
+using HermesTransport.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HermesTransport.Configuration;
@@ -86,18 +87,33 @@ public class HermesTransportOptions
 
     private void RegisterDiscoveredHandlersInDI()
     {
-        var discoveryService = new HandlerDiscoveryService();
         var assemblies = HandlerDiscoveryOptions.AssembliesToScan.ToArray();
         
         if (assemblies.Length > 0)
         {
-            var registrations = discoveryService.DiscoverHandlers(assemblies, HandlerDiscoveryOptions.TypeFilter);
-            
-            foreach (var registration in registrations)
-            {
-                // Register handler as transient in DI container
-                Services.AddTransient(registration.HandlerType);
-            }
+            Services.Scan(scan => scan
+                .FromAssemblies(assemblies)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(IMessageHandler<>))
+                    .Where(type => HandlerDiscoveryOptions.TypeFilter?.Invoke(type) ?? true))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
+
+            Services.Scan(scan => scan
+                .FromAssemblies(assemblies)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(IEventHandler<>))
+                    .Where(type => HandlerDiscoveryOptions.TypeFilter?.Invoke(type) ?? true))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
+
+            Services.Scan(scan => scan
+                .FromAssemblies(assemblies)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(ICommandHandler<>))
+                    .Where(type => HandlerDiscoveryOptions.TypeFilter?.Invoke(type) ?? true))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
         }
     }
 }
