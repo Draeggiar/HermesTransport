@@ -1,5 +1,7 @@
 using HermesTransport.Brokers;
+using HermesTransport.Discovery;
 using HermesTransport.Messaging;
+using HermesTransport.Services;
 using HermesTransport.Subscriptions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -43,6 +45,16 @@ public static class HermesTransportHostExtensions
 
             services.AddTransient<IMessageSubscriber>(provider =>
                 provider.GetRequiredService<IBrokerRegistry>().GetSubscriber());
+
+            // Register handler discovery services
+            services.AddSingleton<IHandlerDiscoveryService, HandlerDiscoveryService>();
+            services.AddSingleton(options.HandlerDiscoveryOptions);
+
+            // Register handler registration service if autodiscovery is enabled
+            if (options.HandlerDiscoveryOptions.IsEnabled)
+            {
+                services.AddHostedService<HandlerRegistrationService>();
+            }
         });
     }
 }

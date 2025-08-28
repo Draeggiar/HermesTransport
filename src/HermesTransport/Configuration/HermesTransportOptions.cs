@@ -1,4 +1,6 @@
 using HermesTransport.Brokers;
+using HermesTransport.Discovery;
+using HermesTransport.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HermesTransport.Configuration;
@@ -11,6 +13,11 @@ public class HermesTransportOptions
 {
     internal readonly BrokerRegistryBuilder BrokerRegistryBuilder = new();
     public IServiceCollection Services { get; }
+
+    /// <summary>
+    /// Gets the handler discovery options.
+    /// </summary>
+    public HandlerDiscoveryOptions HandlerDiscoveryOptions { get; } = new();
 
     public HermesTransportOptions(IServiceCollection services)
     {
@@ -48,5 +55,65 @@ public class HermesTransportOptions
     {
         BrokerRegistryBuilder.RegisterMessageBroker(brokerFactory);
         return this;
+    }
+
+    /// <summary>
+    /// Enables handler autodiscovery with the specified configuration.
+    /// </summary>
+    /// <param name="configure">Action to configure handler discovery options.</param>
+    /// <returns>The options instance for method chaining.</returns>
+    public HermesTransportOptions EnableHandlerDiscovery(Action<HandlerDiscoveryOptions>? configure = null)
+    {
+        HandlerDiscoveryOptions.IsEnabled = true;
+        configure?.Invoke(HandlerDiscoveryOptions);
+        return this;
+    }
+
+    /// <summary>
+    /// Enables handler autodiscovery and automatically registers discovered handlers in the DI container.
+    /// </summary>
+    /// <param name="configure">Action to configure handler discovery options.</param>
+    /// <returns>The options instance for method chaining.</returns>
+    public HermesTransportOptions EnableHandlerDiscoveryWithAutoRegistration(Action<HandlerDiscoveryOptions>? configure = null)
+    {
+        HandlerDiscoveryOptions.IsEnabled = true;
+        configure?.Invoke(HandlerDiscoveryOptions);
+
+        // Auto-register discovered handlers in DI
+        RegisterDiscoveredHandlersInDI();
+        
+        return this;
+    }
+
+    private void RegisterDiscoveredHandlersInDI()
+    {
+        var assemblies = HandlerDiscoveryOptions.AssembliesToScan.ToArray();
+        
+        if (assemblies.Length > 0)
+        {
+            Services.Scan(scan => scan
+                .FromAssemblies(assemblies)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(IMessageHandler<>))
+                    .Where(type => HandlerDiscoveryOptions.TypeFilter?.Invoke(type) ?? true))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
+
+            Services.Scan(scan => scan
+                .FromAssemblies(assemblies)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(IEventHandler<>))
+                    .Where(type => HandlerDiscoveryOptions.TypeFilter?.Invoke(type) ?? true))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
+
+            Services.Scan(scan => scan
+                .FromAssemblies(assemblies)
+                .AddClasses(classes => classes
+                    .AssignableTo(typeof(ICommandHandler<>))
+                    .Where(type => HandlerDiscoveryOptions.TypeFilter?.Invoke(type) ?? true))
+                .AsImplementedInterfaces()
+                .WithTransientLifetime());
+        }
     }
 }
